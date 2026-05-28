@@ -1,4 +1,19 @@
-# YNAB MCP Server
+# YNAB MCP Server (bwright2810 fork)
+
+> **Fork of [jeangnc/ynab-mcp-server](https://github.com/jeangnc/ynab-mcp-server)** by [@jeangnc](https://github.com/jeangnc), licensed under GPL-3.0.
+> This fork adds support for updating category goal targets and notes — functionality missing from the original MCP due to YNAB API endpoint coverage gaps.
+
+## What this fork adds
+
+The original MCP only exposes `updateMonthCategory`, which is limited to changing the budgeted amount for a single month. This fork adds a new `update_category` tool backed by the full `updateCategory` YNAB API endpoint:
+
+| New Tool | What it enables |
+|---|---|
+| `update_category` | Set or update a category's monthly **goal target**, **category note**, goal target date, and goal mode (set aside vs. refill) |
+
+Undo support is included — `update_category` operations appear in `list_history` and can be reverted with `undo_operation`.
+
+---
 
 Talk to your finances.
 
@@ -100,6 +115,7 @@ YNAB_API_TOKEN=$YNAB_API_TOKEN npx ynab-mcp-server
 | `update_transaction` | Update an existing transaction. Only provide the fields you want to change. |
 | `delete_transaction` | Delete an existing transaction. |
 | `update_category_budget` | Update the budgeted amount for a category in a specific month. |
+| `update_category` | Update a category's goal target and/or note. Supports monthly goals, savings goals, and goal mode. |
 | `create_account` | Create a new account in the budget. |
 | `get_scheduled_transaction` | Get detailed information about a specific scheduled transaction. |
 | `create_scheduled_transaction` | Create a new scheduled/recurring transaction. Date must be in the future (max 5 years). |
@@ -138,6 +154,7 @@ The server tracks all write operations (transactions, scheduled transactions, ca
 | Update scheduled transaction | Restores to previous state |
 | Delete scheduled transaction | Recreates the scheduled transaction (new ID) |
 | Update category budget | Restores previous budgeted amount |
+| Update category | Restores previous goal target and note |
 | Update payee | Restores previous name |
 | Create account | **Cannot be undone** (YNAB API limitation) |
 
