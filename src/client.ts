@@ -20,6 +20,7 @@ import type {
   CreateAccountInput,
   CreateScheduledTransactionInput,
   UpdateScheduledTransactionInput,
+  UpdateCategoryInput,
 } from "./schemas.js";
 
 // Re-export types from schemas for consumers
@@ -29,6 +30,7 @@ export type {
   CreateAccountInput,
   CreateScheduledTransactionInput,
   UpdateScheduledTransactionInput,
+  UpdateCategoryInput,
 } from "./schemas.js";
 
 export interface TransactionFilters {
@@ -160,6 +162,10 @@ export interface DeleteTransactionResponse {
 }
 
 export interface UpdateCategoryBudgetResponse {
+  readonly category: ConvertedCategory;
+}
+
+export interface UpdateCategoryResponse {
   readonly category: ConvertedCategory;
 }
 
@@ -452,6 +458,32 @@ export class YNABClient {
           ...st,
           amount: toUnit(st.amount),
         })),
+      },
+    };
+  }
+
+  async updateCategory(
+    budgetId: string,
+    categoryId: string,
+    input: UpdateCategoryInput
+  ): Promise<UpdateCategoryResponse> {
+    const category = {
+      ...(input.note !== undefined && { note: input.note }),
+      ...(input.goal_target !== undefined && { goal_target: toMilliunits(input.goal_target) }),
+      ...(input.goal_target_date !== undefined && { goal_target_date: input.goal_target_date }),
+      ...(input.goal_needs_whole_amount !== undefined && {
+        goal_needs_whole_amount: input.goal_needs_whole_amount,
+      }),
+    };
+
+    const response = await this.api.categories.updateCategory(budgetId, categoryId, { category });
+    const updated = response.data.category;
+    return {
+      category: {
+        ...updated,
+        budgeted: toUnit(updated.budgeted),
+        activity: toUnit(updated.activity),
+        balance: toUnit(updated.balance),
       },
     };
   }

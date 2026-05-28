@@ -12,6 +12,7 @@ import type {
   UpdateScheduledTransactionEntry,
   DeleteScheduledTransactionEntry,
   UpdateCategoryBudgetEntry,
+  UpdateCategoryEntry,
   UpdatePayeeEntry,
   StoredTransactionState,
   StoredScheduledTransactionState,
@@ -58,6 +59,9 @@ export async function executeUndo(client: YNABClient, entry: HistoryEntry): Prom
       );
     case "update_category_budget":
       await undoUpdateCategoryBudget(client, entry);
+      break;
+    case "update_category":
+      await undoUpdateCategory(client, entry);
       break;
     case "update_payee":
       await undoUpdatePayee(client, entry);
@@ -136,6 +140,22 @@ async function undoUpdateCategoryBudget(
     entry.categoryId,
     entry.beforeBudgeted
   );
+}
+
+async function undoUpdateCategory(client: YNABClient, entry: UpdateCategoryEntry): Promise<void> {
+  const { beforeState } = entry;
+  await client.updateCategory(entry.budgetId, entry.categoryId, {
+    ...(beforeState.note !== undefined && { note: beforeState.note ?? "" }),
+    ...(beforeState.goal_target !== undefined && {
+      goal_target: beforeState.goal_target ?? undefined,
+    }),
+    ...(beforeState.goal_target_date !== undefined && {
+      goal_target_date: beforeState.goal_target_date ?? undefined,
+    }),
+    ...(beforeState.goal_needs_whole_amount !== undefined && {
+      goal_needs_whole_amount: beforeState.goal_needs_whole_amount ?? undefined,
+    }),
+  });
 }
 
 async function undoUpdatePayee(client: YNABClient, entry: UpdatePayeeEntry): Promise<void> {

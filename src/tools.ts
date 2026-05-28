@@ -10,6 +10,7 @@ import {
   UpdateTransactionSchema,
   DeleteTransactionSchema,
   UpdateCategoryBudgetSchema,
+  UpdateCategorySchema,
   CreateAccountSchema,
   ScheduledTransactionSchema,
   CreateScheduledTransactionSchema,
@@ -109,6 +110,12 @@ export const tools = [
     name: "update_category_budget",
     description: "Update the budgeted amount for a category in a specific month.",
     inputSchema: z.toJSONSchema(UpdateCategoryBudgetSchema),
+  },
+  {
+    name: "update_category",
+    description:
+      "Update a category's goal target and/or note. Use this to set monthly targets, savings goals, and category notes.",
+    inputSchema: z.toJSONSchema(UpdateCategorySchema),
   },
   {
     name: "create_account",

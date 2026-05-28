@@ -104,6 +104,19 @@ export interface UpdateCategoryBudgetEntry extends BaseHistoryEntry {
   readonly beforeBudgeted: number;
 }
 
+export interface StoredCategoryState {
+  readonly note: string | null | undefined;
+  readonly goal_target: number | null | undefined;
+  readonly goal_target_date: string | null | undefined;
+  readonly goal_needs_whole_amount: boolean | null | undefined;
+}
+
+export interface UpdateCategoryEntry extends BaseHistoryEntry {
+  readonly operation: "update_category";
+  readonly categoryId: string;
+  readonly beforeState: StoredCategoryState;
+}
+
 // Payee operations
 export interface UpdatePayeeEntry extends BaseHistoryEntry {
   readonly operation: "update_payee";
@@ -121,6 +134,7 @@ export type HistoryEntry =
   | DeleteScheduledTransactionEntry
   | CreateAccountEntry
   | UpdateCategoryBudgetEntry
+  | UpdateCategoryEntry
   | UpdatePayeeEntry;
 
 // Type for operations that can be undone

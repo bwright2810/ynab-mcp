@@ -16,6 +16,7 @@ import {
   UpdateTransactionSchema,
   DeleteTransactionSchema,
   UpdateCategoryBudgetSchema,
+  UpdateCategorySchema,
   CreateAccountSchema,
   ScheduledTransactionSchema,
   CreateScheduledTransactionSchema,
@@ -138,6 +139,11 @@ function createHandlers(
     update_category_budget: (args) => {
       const { budget_id, month, category_id, budgeted } = UpdateCategoryBudgetSchema.parse(args);
       return trackedClient.updateCategoryBudget(budget_id, month, category_id, budgeted);
+    },
+
+    update_category: (args) => {
+      const { budget_id, category_id, ...updates } = UpdateCategorySchema.parse(args);
+      return trackedClient.updateCategory(budget_id, category_id, updates);
     },
 
     create_account: (args) => {

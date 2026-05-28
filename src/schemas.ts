@@ -122,6 +122,21 @@ export const UpdateCategoryBudgetSchema = z.object({
   budgeted: z.number().describe("The budgeted amount for this category"),
 });
 
+export const UpdateCategorySchema = z.object({
+  budget_id: z.string().describe("The budget ID"),
+  category_id: z.string().describe("The category ID"),
+  note: z.string().optional().describe("Category note (pass empty string to clear)"),
+  goal_target: z.number().optional().describe("The monthly goal target amount"),
+  goal_target_date: z
+    .string()
+    .optional()
+    .describe("Goal target date in ISO format (YYYY-MM-DD), for savings goals"),
+  goal_needs_whole_amount: z
+    .boolean()
+    .optional()
+    .describe("True for 'Set Aside' mode, false for 'Refill' mode"),
+});
+
 export const CreateAccountSchema = z.object({
   budget_id: z.string().describe("The budget ID"),
   name: z.string().describe("The account name"),
@@ -218,4 +233,8 @@ export type CreateScheduledTransactionInput = Omit<
 export type UpdateScheduledTransactionInput = Omit<
   z.infer<typeof UpdateScheduledTransactionSchema>,
   "budget_id" | "scheduled_transaction_id"
+>;
+export type UpdateCategoryInput = Omit<
+  z.infer<typeof UpdateCategorySchema>,
+  "budget_id" | "category_id"
 >;

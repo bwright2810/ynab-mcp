@@ -5,6 +5,7 @@ import type {
   CreateAccountInput,
   CreateScheduledTransactionInput,
   UpdateScheduledTransactionInput,
+  UpdateCategoryInput,
   CreateTransactionResponse,
   UpdateTransactionResponse,
   DeleteTransactionResponse,
@@ -13,8 +14,10 @@ import type {
   DeleteScheduledTransactionResponse,
   CreateAccountResponse,
   UpdateCategoryBudgetResponse,
+  UpdateCategoryResponse,
   UpdatePayeeResponse,
 } from "../client.js";
+import { toUnit } from "../currency.js";
 import type { HistoryStore } from "./history-store.js";
 import type {
   CreateTransactionEntry,
@@ -25,6 +28,7 @@ import type {
   DeleteScheduledTransactionEntry,
   CreateAccountEntry,
   UpdateCategoryBudgetEntry,
+  UpdateCategoryEntry,
   UpdatePayeeEntry,
   StoredTransactionState,
   StoredScheduledTransactionState,
@@ -198,6 +202,34 @@ export class TrackedYNABClient {
       operation: "create_account",
       createdId: result.account.id,
       canUndo: false,
+    };
+
+    await this.historyStore.add(entry);
+    return result;
+  }
+
+  async updateCategory(
+    budgetId: string,
+    categoryId: string,
+    input: UpdateCategoryInput
+  ): Promise<UpdateCategoryResponse> {
+    const { category: before } = await this.client.getCategory(budgetId, categoryId);
+
+    const result = await this.client.updateCategory(budgetId, categoryId, input);
+
+    const entry: UpdateCategoryEntry = {
+      id: createHistoryEntryId(),
+      timestamp: new Date().toISOString(),
+      budgetId,
+      status: "success",
+      operation: "update_category",
+      categoryId,
+      beforeState: {
+        note: before.note,
+        goal_target: before.goal_target != null ? toUnit(before.goal_target) : before.goal_target,
+        goal_target_date: undefined,
+        goal_needs_whole_amount: before.goal_needs_whole_amount,
+      },
     };
 
     await this.historyStore.add(entry);
